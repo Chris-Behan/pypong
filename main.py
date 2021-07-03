@@ -14,6 +14,7 @@ fps_clock = pygame.time.Clock()
 @dataclass
 class Player:
     image: Any
+    sound: Any
     x_pos: int
     y_pos: int
     width: int
@@ -35,26 +36,29 @@ class Ball:
 
 def main():
     pygame.init()
-
     pygame.display.set_caption('pypong')
-
     screen = pygame.display.set_mode((800, 600))
-    print(pygame.font.get_fonts())
+    ball_img = pygame.image.load('assets/ball.png')
+    pygame.display.set_icon(ball_img)
+
     img1 = pygame.image.load('assets/paddle_1.png')
+    sound1 = pygame.mixer.Sound('assets/paddle_1_sound.ogg')
     p1 = Player(image=img1,
+                sound=sound1,
                 x_pos=0,
                 y_pos=SCREEN_HEIGHT / 2 - img1.get_height() / 2,
                 width=img1.get_width(),
                 height=img1.get_height())
 
     img2 = pygame.image.load('assets/paddle_2.png')
+    sound2 = pygame.mixer.Sound('assets/paddle_2_sound.ogg')
     p2 = Player(image=img2,
+                sound=sound2,
                 x_pos=SCREEN_WIDTH - img2.get_width(),
                 y_pos=SCREEN_HEIGHT / 2 - img2.get_height() / 2,
                 width=img2.get_width(),
                 height=img2.get_height())
 
-    ball_img = pygame.image.load('assets/ball.png')
     ball = Ball(
         image=ball_img,
         x_pos=SCREEN_WIDTH / 2 - ball_img.get_width() / 2,
@@ -140,15 +144,15 @@ def update_state(p1: Player, p2: Player, ball: Ball, started: bool):
             ball.x_vel = abs(ball.x_vel)
             if ball.x_vel * ball_speed < max_ball_speed:
                 ball.x_vel *= 1.05
-                print(ball.x_vel * ball_speed)
             ball.y_vel = (ball_y_center - p1_y_center) / p1.height
+            p1.sound.play()
 
         elif (ball_x_right >= p2.x_pos and ball_y_bottom >= p2.y_pos and ball_y_top <= p2.y_pos + p2.height):
             ball.x_vel = -abs(ball.x_vel)
             if ball.x_vel * ball_speed > -max_ball_speed:
                 ball.x_vel *= 1.05
-                print(ball.x_vel * ball_speed)
             ball.y_vel = (ball_y_center - p2_y_center) / p2.height
+            p2.sound.play()
 
         elif ball_y_top <= 0:
             ball.y_vel = abs(ball.y_vel)
